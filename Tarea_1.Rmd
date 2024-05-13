@@ -1,0 +1,210 @@
+---
+title: | 
+  | \vspace{5cm} \LARGE \textbf{La obra de William Shakespeare: un breve análisis}
+subtitle:  | 
+  | \vspace{4cm} \textbf{Tarea 1 Introducción a la ciencia de datos}
+author: | 
+  |  \textbf{Alvaro Valiño - Lucía Coudet}
+date: | 
+  | \vspace{1cm} Montevideo, Mayo 2024 
+header-includes:
+- \usepackage{titling}
+- \pretitle{\begin{center}\includegraphics[width=8cm]{logo_informe.jpg}\\[\bigskipamount]}
+- \posttitle{\end{center}}
+- \usepackage{actuarialsymbol}
+- \usepackage[spanish]{babel}
+- \usepackage[medium]{titlesec}
+- \usepackage{geometry}\geometry{top=3cm,bottom=3cm,left=3cm,right=3cm}
+mainfont: Arial
+output:
+  pdf_document:
+    toc: no
+    number_sections: yes
+fontsize: 12pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(readxl)
+library(readr)
+library(tidyverse)
+library(here)
+library(kableExtra)
+library(wordcloud)
+```
+
+```{r}
+df_chapters <- read.csv(here('data','chapters.csv'))
+df_characters <- read.csv(here('data','characters.csv'))
+df_paragraphs <- read.csv(here('data','paragraphs.csv'))
+df_works <- read.csv(here('data','works.csv'))
+```
+
+# Introducción
+
+William Shakespeare fue un dramaturgo, poeta, y actor de origen ingles nacido en abril del año 1564 en *Warwickshire* al sureste de *Birmingham*, Inglaterra.
+
+Cursó sus primeros estudios en la escuela primaria local *Stratford Grammar School* lo cual se piensa que le aportó una educación sólida en gramática y literatura. A pesar de que la calidad de las escuelas gramaticales de la época era bastante irregular, existen indicios en el sentido de que la de *Stratford* era bastante buena. 
+
+El 28 de noviembre de 1582, cuando tenía dieciocho años de edad, contrajo matrimonio con Anne Hathaway, de 26 años y originaria de una localidad próxima a *Stratford*. 
+
+Alrededor del año 1592 comenzó su carrera teatral en Londres escribiendo y actuando en obras para la compañía teatral *Lord Chamberlain´s Men* la cual fue mas tarde conocida como *King's Men*.
+
+Sus obras que incluyen tragedias como *Hamlet* y *Macbeth*, comedias como *El sueño de una noche de verano* y *La comedia de los errores* y obras históricas como *Enrique V* y *Ricardo III*, entre otras, son celebradas por su profundidad, ingenio, y habilidad para explorar la complejidad humana.
+
+William Shakespeare se convirtió en una figura central de la literatura inglesa y su legado continua siendo influyente en la actualidad.
+
+# Objetivo
+
+Este trabajo tiene por objetivo presentar un breve análisis de la obra Shakespeariana utilizando las bases de datos disponibles en https://relational-data.org/dataset/Shakespeare.
+
+Se trata de una base de datos relacional que cuenta con información sobre las obras, los capítulos, los personajes y los párrafos para cada personaje de cada obra.
+
+# Análisis exploratorio de datos
+
+William Shakespeare produjo un total de 43 obras entre los años 1589 y 1612 y las mismas abarcan los géneros de tragedia, comedia, historia, poesía y soneto.
+
+En el cuadro 1 del anexo se presentan la totalidad de sus obras en orden cronológico según la fecha de realización de las mismas. Como puede observarse en el mismo, las obras varian entre los distintos géneros a través de los años.
+
+En la Figura 1 se presenta el gráfico de barras de los géneros de sus obras. En el mismo puede observarse los 3 géneros predominantes entre sus obras son comedia, historia y tragedia.
+
+```{r, fig.align='center', out.width='90%', fig.cap='Gráfico de barras de los géneros de las obras de William Shakespeare', fig.pos="H"}
+df_works %>% group_by(GenreType) %>% summarise(conteo = n()) %>%
+  ggplot(aes(x = reorder(GenreType, -conteo), y = conteo)) +
+  geom_bar(stat = 'identity',  color = 'navyblue', fill = 'navyblue') +
+  theme(legend.position = 'none',
+        axis.text.x = element_text(face = 'bold'),
+        axis.title.x = element_text(face = 'bold')) +
+  labs(x = 'Género de la obra', y='') +
+  scale_x_discrete(labels = c('Comedia', 'Historia', 'Tragedia', 'Poesia', 'Soneto'))
+```
+
+Por otra parte, en lo que respecta a la composición a lo largo de los años, el gráfico de barras de la Figura 2 sugiere que no existe una tendencia clara para un género en particular. Asimismo, se observa que en todos los años entre 1589 y 1612 produjo obras escritas excepto en el año 1603 donde no existe registro de la producción de ninguna obra.
+
+```{r, fig.align='center', out.width='90%', fig.cap = 'Gráfico de barras de las obras de Shakepeare a través del tiempo, según el género de las mismas', fig.pos="H"}
+df_works %>% 
+  ggplot() + 
+  geom_histogram(aes(x = Date, fill = GenreType), binwidth = 1) +
+  theme(legend.text = element_text(face = 'bold'),
+        legend.title = element_text(face = 'bold'),
+        legend.box.margin = margin(1,1,1,1),
+        axis.text.x = element_text(face = 'bold'),
+        axis.title.x = element_text(face = 'bold')) +
+  labs(x = 'Año', y='') +
+  scale_fill_discrete(name = 'Genero de la obra', labels = c('Comedia','Historia','Poema','Soneto','Tragedia'))
+```
+
+# Algunas de sus obras mas relevantes
+
+*Hamlet* y *Romeo y julieta* son dos de las obras mas reconocidas de Shakespeare. *Romeo y Julieta* (1594) es una tragedia donde se cuenta la historia de dos jóvenes amantes, *Romeo* y *Julieta*, cuyas familias estan enemistadas. A pesar de las rivalidades de sus familias, se enamoran profundamente y deciden casarse en secreto. Esta obra explora temas como el amor, el destino, la violencia, y el conflicto familiar.
+
+Por otro lado, *Hamlet* (1600) es también una tragedia que gira en torno al Prínicipe Hamlet de Dinamarca, quien busca vengar la muerte de su padre, el Rey, en manos de su tío Claudio. Luego de la muerte del Rey, su hermano Claudio se convierte en el nuevo Rey y se casa con su esposa, la madre de *Hamlet*. Este obra examina temas como la venganza, la locura, la traicion y la corrupción.
+
+Como fue mencionado anteriormente, la base de datos de los *párrafos* contiene la informacion sobre lo que dice cada personaje en cada acto de cada escena. Si analizamos la cantidad de veces que interviene cada personaje en la obra de *Romeo y Julieta*, vemos como el personaje con mas intervenciones es *Romeo* seguido por *stage directions*. Es recién en tercer lugar que se encuentra *Julieta*. En total, estos tres personajes tienen el 43.2\% de las intervenciones de la obra.
+
+```{r}
+data <- df_paragraphs %>% left_join(df_chapters, by = c('chapter_id'= 'id'))
+data <- data %>% left_join(df_characters, by = c('character_id'= 'id'))
+data <- data %>% left_join(df_works, by = c('work_id'= 'id'))
+
+ryj <- data %>% filter(Title == 'Romeo and Juliet')
+
+prop_ryj <- ryj %>% group_by(CharName) %>% summarise(conteo = n()) %>%
+                                            mutate(porc = round(conteo / sum(conteo) * 100, 1))%>% arrange(desc(conteo))
+```
+
+```{r, results = 'asis'}
+kable(head(prop_ryj,10), format = 'latex', caption = 'Intervenciones de cada personaje en la obra Romeo y Julieta') %>%
+  kable_styling(latex_options = 'HOLD_position')
+```
+
+Por otro lado, en lo que respecta a la obra de *Hamlet*, el personaje Hamlet tiene el 28,1\% de las intervenciones seguido por *stage directions* que tiene el 11\%. En total, estos dos personajes tienen en total el 39.1\% de las intervenciones.
+
+```{r}
+hamlet <- data %>% filter(Title == 'Hamlet')
+
+prop_hamlet <- hamlet %>% group_by(CharName) %>% summarise(conteo = n()) %>%
+                                            mutate(porc = round(conteo / sum(conteo) * 100, 1))%>% arrange(desc(conteo))
+```
+
+```{r, results = 'asis'}
+kable(head(prop_hamlet,10), format = 'latex', caption = 'Intervenciones de cada personaje en la obra Hamlet') %>%
+  kable_styling(latex_options = 'HOLD_position')
+```
+
+Como vemos tanto en la obra de *Romeo y Julieta* como en la obra de *Hamlet*, *stage directions* es el segundo personaje con mas intervenciones. Esto implica que el segundo personaje con mas intervenciones en ambas obras no es en si mismo un personaje, sino que son las acotaciones durante la obra. Esto es un aspecto que caracteriza a las obras de William Shakespeare.
+
+Ahora bien, los resultdos anteriores se obtuvieron contando el número de intervenciones y no el número de palabras. Una pregunta que se desprende del análisis anterior es cuales son los personajes con mayor número de palabras en las obras de Shakespeare.
+
+Para ello, trabajamos con las bases de datos de los párrafos y de los personajes. En el gráfico de barras de la Figura 3 se presenta el \% de palabras dichas por los 10 personajes con más palabras.
+
+```{r}
+words_per_character <- read.csv(here("data", "words_per_character.csv"))
+```
+
+```{r, fig.cap='Los 10 personajes de las obras de Shakespeare con mas palabras', fig.align='center', out.width='80%', fig.pos="H"}
+head(words_per_character,10) %>% ggplot() + 
+  geom_bar(aes(x = reorder(CharName, -word), y = word), stat = 'identity', 
+           color = 'firebrick', fill = 'firebrick') +
+  theme(axis.text.x = element_text(face = 'bold', angle = 90),
+        legend.position = 'none',
+        axis.title.x = element_text(face = 'bold')) +
+  labs(x = 'Personaje', y = '')
+```
+
+El gráfico nos muestra que los dos personajes con mas palabras son *Poet* y *stage directions* los cuales no son personajes en sí mismos. *Poet* es *la voz de la poesia de Shakespeare* mientras que, como fue mencionado anteriormente, *stage directions* son las acotaciones en el escenario.
+
+Si excluimos a *Poet* y *stage directions* del análisis, en el gráfico de barras de la Figura 4 se presentan los 10 personajes con mas palabras.
+
+```{r, fig.cap='Los 10 personajes de las obras de Shakespeare con mas palabras excluyendo a Poet y Stage directions', fig.align='center', out.width='80%', fig.pos="H"}
+head(words_per_character,12)[3:12,]  %>% ggplot() + 
+  geom_bar(aes(x = reorder(CharName, -word), y = word), stat = 'identity', 
+           color = 'firebrick', fill = 'firebrick') +
+  theme(axis.text.x = element_text(face = 'bold', angle = 90),
+        legend.position = 'none') +
+  labs(x = 'Personaje', y = '')
+```
+
+Por último, en la figura 5 se presenta el gráfico de palabras de todas las obras de Shakespeare. Se observa que las palabras que mas aparecen son conectoras como por ejemplo *and*, *the*, *of*, entre otras.
+
+```{r}
+df_words <- read.csv(here('data', 'df_words.csv'))
+```
+
+```{r}
+tabla_words <- df_words %>% group_by(word) %>%
+  summarise(frecuencia = n())
+```
+
+```{r, fig.cap = 'Gráfico de palabras de las obras de William shakespeare', fig.pos="H"}
+set.seed(1234)
+wordcloud(words = tabla_words$word, freq = tabla_words$frecuencia, min.freq = 1,
+          max.words=200, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+
+```
+
+Por lo tanto, para poder realizar un análisis de las palabras resulta necesario avanzar un paso más en la limpieza de la base de datos y eliminar las palabras que sean conectoras.
+
+# Comentarios finales
+
+Las obras de William Shakespeare fueron producidas entre los años 1589 y 1612 siendo los géneros predominantes en sus obras comedia, historia, y tragedia.
+
+Si se analiza a través de los años, no se observa alguna tendencia en particular en la selección de los géneros que produjo.
+
+Si se analizan todas las obras en su conjunto, *Poet* y *stage directions* aparecen como los personajes con más palabras, los cuales no son en sí mismos personajes. Por otra parte, las palabras que más aparecen son conectoras lo cual es de esperar ya que no se excluyeron del análisis antes de realizar el gráfico de palabras.
+
+Para futuros análisis se sugiera avanzar en la limpieza de los datos, en particular de las palabras.
+
+# Anexo
+
+
+```{r, results='asis'}
+kable(df_works %>% arrange(Date) %>% select(-X, -id, -LongTitle), format = 'latex', caption = 'Las obras de William Shakespeare', col.names = c('Titulo', 'Fecha', 'Genero')) %>%
+  kable_styling(latex_options = 'HOLD_position', font_size = 10, 
+                bootstrap_options = c("striped", "hover"))
+```
+
+
+
+
