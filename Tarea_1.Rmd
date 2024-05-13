@@ -185,7 +185,6 @@ wordcloud(words = tabla_words$word, freq = tabla_words$frecuencia, min.freq = 1,
 ```
 
 Por lo tanto, para poder realizar un análisis de las palabras resulta necesario avanzar un paso más en la limpieza de la base de datos y eliminar las palabras que sean conectoras.
- 
 \newpage 
  
 # Comentarios finales
