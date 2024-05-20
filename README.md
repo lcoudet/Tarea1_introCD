@@ -1,4 +1,4 @@
-Este reppositorio contiene los archivos necesarios para ejecutar el informe en Tarea_1.RMD.
+Este repositorio contiene los archivos necesarios para ejecutar el informe en Tarea_1.RMD.
 
 En la carpeta data se encuentran las bases de datos utilizadas.
 El archivo auxiliar.ipynb tiene el código utilizado para exportar las bases de datos.

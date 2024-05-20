@@ -12,7 +12,7 @@ header-includes:
 - \pretitle{\begin{center}\includegraphics[width=8cm]{logo_informe.jpg}\\[\bigskipamount]}
 - \posttitle{\end{center}}
 - \usepackage{actuarialsymbol}
-- \usepackage[spanish]{babel}
+#- \usepackage[spanish]{babel}
 - \usepackage[medium]{titlesec}
 - \usepackage{geometry}\geometry{top=3cm,bottom=3cm,left=3cm,right=3cm}
 mainfont: Arial
@@ -25,12 +25,13 @@ fontsize: 12pt
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
-library(readxl)
 library(readr)
 library(tidyverse)
 library(here)
 library(kableExtra)
 library(wordcloud)
+library(reticulate)
+use_condaenv("tarea1")
 ```
 
 ```{r}
@@ -167,6 +168,8 @@ head(words_per_character,12)[3:12,]  %>% ggplot() +
 
 Por último, en la figura 5 se presenta el gráfico de palabras de todas las obras de Shakespeare. Se observa que las palabras que mas aparecen son conectoras como por ejemplo *and*, *the*, *of*, entre otras.
 
+\newpage
+
 ```{r}
 df_words <- read.csv(here('data', 'df_words.csv'))
 ```
@@ -184,10 +187,37 @@ wordcloud(words = tabla_words$word, freq = tabla_words$frecuencia, min.freq = 1,
 
 ```
 
-Por lo tanto, para poder realizar un análisis de las palabras resulta necesario avanzar un paso más en la limpieza de la base de datos y eliminar las palabras que sean conectoras.
+Por lo tanto, para poder realizar un análisis de las palabras resulta necesario avanzar un paso más en la limpieza de la base de datos y eliminar las palabras que sean conectoras. En la figura 6 se presentan los resultados obtenido al realizar un primer filtro.
+
+```{python}
+import pandas as pd
+import nltk
+from nltk.corpus import stopwords
+
+#nltk.download('stopwords')
+words = stopwords.words('english')
+
+df_filter = r.df_words[~r.df_words['word'].isin(words)]
+
+```
+
+```{r}
+tabla_words_filter <- py$df_filter %>% group_by(word) %>%
+  summarise(frecuencia = n())
+```
+
+```{r, fig.cap = 'Gráfico de palabras de las obras de William shakespeare filtrando palabras conectoras', fig.pos="H"}
+set.seed(1234)
+wordcloud(words = tabla_words_filter$word, freq = tabla_words_filter$frecuencia, min.freq = 1,
+          max.words=200, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+
+```
+
 
 \newpage 
- 
+
+
 # Comentarios finales
 
 Las obras de William Shakespeare fueron producidas entre los años 1589 y 1612 siendo los géneros predominantes en sus obras comedia, historia, y tragedia.
